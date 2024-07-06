@@ -1,0 +1,82 @@
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import loginTable, PatientTable
+from Webadmin.models import DoctorTable
+
+# Create your views here.
+def patientregistration(request):
+    if request.method == 'POST':
+        firstname = request.POST['firstname']
+        lastname = request.POST['lastname']
+        dob = request.POST['dob']
+        email = request.POST['email']
+        password = request.POST['password']
+        cpassword = request.POST['cpassword']
+
+        if password == cpassword:
+            if not loginTable.objects.filter(email=email).exists():
+                patient = PatientTable(
+                    first_name=firstname,
+                    last_name=lastname,
+                    dob=dob,
+                    email=email,
+                    password=password
+                )
+                login = loginTable(
+                    username=firstname,
+                    email=email,
+                    password=password,
+                    type='patient'
+                )
+
+                patient.save()
+                login.save()
+                messages.success(request, 'Registration Success')
+                return redirect('login')
+            else:
+                messages.error(request, 'Email already registered')
+        else:
+            messages.error(request, 'Passwords do not match')
+            
+    return render(request, 'guest/PatientRegistration.html')
+
+def loginpage(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
+        
+        try:
+            user = loginTable.objects.get(email=email, password=password)
+            request.session['username'] = user.username
+            
+            if user.type == 'webadmin':
+                return redirect("webadmin")
+            elif user.type == 'doctor':
+                try:
+                    doctor = DoctorTable.objects.get(email=email)
+                    request.session['id'] = doctor.id
+                    return redirect('doctor')
+                except DoctorTable.DoesNotExist:
+                    messages.error(request, 'Doctor not found')
+            elif user.type == 'patient':
+                try:
+                    patient = PatientTable.objects.get(email=email)
+                    request.session['id'] = patient.id
+                    return redirect('patient')
+                except PatientTable.DoesNotExist:
+                    messages.error(request, 'Patient not found')
+        except loginTable.DoesNotExist:
+            messages.error(request, 'Invalid username or password')
+    return render(request, "guest/login.html")
+
+def webadmin(request):
+    name = request.session.get('username', 'Guest')
+    return render(request, 'webadmin/Home.html', {'name': name})
+
+def doctor(request):
+    id = request.session.get('id')
+    return render(request, 'doctor/Home.html', {'id': id})
+
+def patient(request):
+    id = request.session.get('id')
+    return render(request, 'patient/Home.html', {'id': id})
