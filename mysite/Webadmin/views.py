@@ -1,9 +1,19 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.db.utils import IntegrityError
 from .models import DoctorTable, DepartmentTable
+from guest.models import PatientTable
 from guest.models import loginTable
 
 # Create your views here.
+def webadmin_required(view_func):
+    def wrapper_func(request, *args, **kwargs):
+        if request.session.get('type') != 'webadmin':
+            return redirect('login')  # Redirect to the login page if not 'webadmin'
+        return view_func(request, *args, **kwargs)
+    return wrapper_func
+
+@webadmin_required
 def doctorregistration(request):
     if request.method == 'POST':
         firstname = request.POST['firstname']
@@ -15,7 +25,18 @@ def doctorregistration(request):
         cpassword = request.POST['cpassword']
 
         if password == cpassword:
-            if not loginTable.objects.filter(email=email).exists():
+            try:
+                login, created = loginTable.objects.get_or_create(
+                    username=firstname,
+                    email=email,
+                    password=password,
+                    type='doctor'
+                )
+
+                if not created:
+                    messages.error(request, 'Email already registered')
+                    return redirect('doctorslist')
+                
                 doctor = DoctorTable(
                     first_name=firstname,
                     last_name=lastname,
@@ -24,27 +45,28 @@ def doctorregistration(request):
                     email=email,
                     password=password
                 )
-                login = loginTable(
-                    username=firstname,
-                    email=email,
-                    password=password,
-                    type='doctor'
-                )
 
                 doctor.save()
                 login.save()
                 messages.success(request, 'Registration Success')
-            else:
+                return redirect('doctorslist')
+
+            except IntegrityError:
                 messages.error(request, 'Email already registered')
+                return redirect('doctorslist')
+
         else:
             messages.error(request, 'Passwords do not match')
+            return redirect('doctorslist')
 
-    return render(request, 'webadmin/AddDoctor.html')
+    return render(request, 'webadmin/Index.html')
 
+@webadmin_required
 def doctorslist(request):
     doctors = DoctorTable.objects.all()
     return render(request, 'webadmin/DoctorList.html', {'doctors': doctors})
 
+@webadmin_required
 def departments(request):
     if request.method == 'POST':
         name = request.POST['name']
@@ -53,7 +75,19 @@ def departments(request):
             dep = DepartmentTable(name=name)
             dep.save()
             messages.success(request, 'Department added successfully')
+            return redirect('departmentlist')
         else:
             messages.error(request, 'Department already exists')
+            return redirect('departmentlist')
 
-    return render(request, 'webadmin/AddDepartments.html')
+    return render(request, 'webadmin/Index.html')
+
+@webadmin_required
+def departmentlist(request):
+    department = DepartmentTable.objects.all()
+    return render(request, 'webadmin/DepartmentList.html', {'departments': department})
+
+@webadmin_required
+def patientlist(request):
+    patien = PatientTable.objects.all()
+    return render(request,"webadmin/PatientsList.html")

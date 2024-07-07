@@ -3,21 +3,21 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Doctors</h1>
+    <h1 class="mb-4">Deparments</h1>
     <div class="table-responsive">
         <table class="table table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Name</th>
-                    <th>Specialized</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                {% for doctor in doctors %}
+                {% for department in departments %}
                 <tr>
-                    <td>{{ doctor.first_name }} {{ doctor.last_name }}</td>
-                    <td>{{ doctor.specialized }}</td>
+                    <td>{{ department.id }}</td>
+                    <td>{{ department.name }}</td>
                     <td>
                         <a href="#" class="btn btn-warning btn-sm">Edit</a>
                         <a href="#" class="btn btn-danger btn-sm">Delete</a>
@@ -28,9 +28,12 @@
             </tbody>
         </table>
     </div>
-    <button type="button" class="btn btn-primary rounded-circle float-end" data-bs-toggle="modal" data-bs-target="#registrationModal">
+    <!-- <a href="{% url 'newdepartments' %}" class="btn btn-primary rounded-circle float-end">
         <i class="fa fa-plus"></i>
-      </button>
+    </a> -->
+    <button type="button" class="btn btn-primary rounded-circle float-end" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">
+        <i class="fa fa-plus"></i>
+    </button>
 </div>
 {% endblock %}
 

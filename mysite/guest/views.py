@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.sessions.backends.db import SessionStore
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
 from .models import loginTable, PatientTable
 from Webadmin.models import DoctorTable
 
@@ -50,11 +53,13 @@ def loginpage(request):
             request.session['username'] = user.username
             
             if user.type == 'webadmin':
+                request.session['type'] = "webadmin"
                 return redirect("webadmin")
             elif user.type == 'doctor':
                 try:
                     doctor = DoctorTable.objects.get(email=email)
                     request.session['id'] = doctor.id
+                    request.session['type'] = "doctor"
                     return redirect('doctor')
                 except DoctorTable.DoesNotExist:
                     messages.error(request, 'Doctor not found')
@@ -62,6 +67,7 @@ def loginpage(request):
                 try:
                     patient = PatientTable.objects.get(email=email)
                     request.session['id'] = patient.id
+                    request.session['type'] = "patient"
                     return redirect('patient')
                 except PatientTable.DoesNotExist:
                     messages.error(request, 'Patient not found')
@@ -70,13 +76,25 @@ def loginpage(request):
     return render(request, "guest/login.html")
 
 def webadmin(request):
-    name = request.session.get('username', 'Guest')
-    return render(request, 'webadmin/Home.html', {'name': name})
+    type = request.session.get('type')
+    return render(request, 'webadmin/Home.html', {'type': type})
 
 def doctor(request):
     id = request.session.get('id')
-    return render(request, 'doctor/Home.html', {'id': id})
+    type = request.session.get('type')
+    return render(request, 'doctor/Home.html', {'id': id,'type': type})
 
 def patient(request):
     id = request.session.get('id')
-    return render(request, 'patient/Home.html', {'id': id})
+    type = request.session.get('type')
+    return render(request, 'patient/Home.html', {'id': id,'type': type})
+
+def logout_view(request):
+    # Clear the session
+    request.session.flush()
+
+    # Create a new session
+    request.session = SessionStore()
+
+    # Redirect the user to the login page
+    return HttpResponseRedirect(reverse_lazy('login'))
