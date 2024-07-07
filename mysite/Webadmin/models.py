@@ -6,6 +6,7 @@ class DoctorTable(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     dob = models.DateField()
+    image=models.ImageField(upload_to='profile',null=True,blank=True)
     specialized = models.TextField()
     email = models.EmailField(max_length=200)
     password = models.CharField(max_length=200)

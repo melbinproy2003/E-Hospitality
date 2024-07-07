@@ -89,5 +89,5 @@ def departmentlist(request):
 
 @webadmin_required
 def patientlist(request):
-    patien = PatientTable.objects.all()
-    return render(request,"webadmin/PatientsList.html")
+    patient = PatientTable.objects.all()
+    return render(request,"webadmin/PatientsList.html",{'patient':patient})
