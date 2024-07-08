@@ -1,0 +1,24 @@
+{% extends "patient/Index.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Appointments</h1>
+    <div class="row">
+        {% for appointment in appointments %}
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">{{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}</h2>
+                        <p class="card-text"><strong>Date:</strong> {{ appointment.date }}</p>
+                        <p class="card-text"><strong>Time:</strong> {{ appointment.time }}</p>
+                        <p class="card-text"><strong>Message:</strong> {{ appointment.message }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

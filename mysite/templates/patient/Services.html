@@ -12,30 +12,58 @@
     </div>
 </div>
 
-{% for dept in departments %}
-<div id="{{ dept.name }}" class="container mt-4">
-    <h3>{{ dept.name }}</h3>
+{% for department in departments %}
+<div id="{{ department.name }}" class="container mt-4">
+    <h3>{{ department.name }}</h3>
     <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Name</th>
-                    <th>Specialized</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for assignment in assign %}
-                {% if assignment.department.id == dept.id %}
+                {% if assignment.department.id == department.id %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ assignment.doctor.first_name }} {{ assignment.doctor.last_name }}</td>
-                    <td>{{ assignment.doctor.specialized }}</td>
+                    <td>
+                        <a href="#AppointmentModal{{ assignment.doctor.id }}" class="btn btn-primary" data-bs-toggle="modal">Book Appointment</a>
+                    </td>
                 </tr>
                 {% endif %}
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Appointment Modals -->
+{% for assignment in assign %}
+<div id="AppointmentModal{{ assignment.doctor.id }}" class="modal fade" tabindex="-1" aria-labelledby="AppointmentModalLabel{{ assignment.doctor.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="AppointmentModalLabel{{ assignment.doctor.id }}">Dr. {{ assignment.doctor.first_name }} {{ assignment.doctor.last_name }} ({{ assignment.doctor.specialized }})</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>                                
+            <form method="POST" action="{% url 'appointment' assignment.doctor.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Book Appointment</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endfor %}

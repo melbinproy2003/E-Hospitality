@@ -67,12 +67,16 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'showdoctors' %}">Services</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'showappointments' %}">showappointments</a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link " href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fa-regular fa-circle-user fa-lg"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="{% url 'patientprofile' %}"><i class="fa-solid fa-user"></i>  Profile</a></li>
+                                <li><a class="dropdown-item" href="#medicalHistoryModal" data-bs-toggle="modal"><i class="fa-solid fa-notes-medical"></i>  Medical History</a></li>
                                 <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"></i>  logout</a></li>
                             </ul>
                         </li>                        
@@ -84,6 +88,91 @@
     <main>
         {% block content %} {% endblock %}
     </main>
+
+    <!-- Add Medical History Modal -->
+    <div class="modal fade" id="medicalHistoryModal" tabindex="-1" aria-labelledby="medicalHistoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="medicalHistoryModalLabel">{% if medical_history %} Update Medical History {% else %} Create Medical History {% endif %}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'medicalhistory' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <p>Asthma,Diabetes,Eplepsy,etc.. this coditions that you have or any member of your family has</p>
+                            <label for="FamilyTree" class="form-label">List this type of disease:</label>
+                            <textarea id="FamilyTree" name="FamilyTree" class="form-control" rows="3" required>{{ medical_history.FamilyTree|default_if_none:'' }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <!-- <label for="symptoms" class="form-label">Symptoms:</label> -->
+                             <p>Any symotoms that you have like chest pain,shortness of breathetc</p>
+                            <textarea id="symptoms" name="symptoms" class="form-control" rows="3" required>{{ medical_history.symptoms|default_if_none:'' }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Are you taking any medication?</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" id="takingMedicationYes" name="takingMedication" value="Y" class="form-check-input" required {% if medical_history and medical_history.takingMedication == 'Y' %}checked{% endif %}>
+                                    <label for="takingMedicationYes" class="form-check-label">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" id="takingMedicationNo" name="takingMedication" value="N" class="form-check-input" required {% if medical_history and medical_history.takingMedication == 'N' %}checked{% endif %}>
+                                    <label for="takingMedicationNo" class="form-check-label">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="listmedication" class="form-label">List Medication:</label>
+                            <textarea id="listmedication" name="listmedication" class="form-control" rows="3" >{{ medical_history.listmedication|default_if_none:'' }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Do you have any medication allergies?</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" id="medicationAllergiesYes" name="medicationAllergies" value="Y" class="form-check-input" required {% if medical_history and medical_history.medicationAllergies == 'Y' %}checked{% endif %}>
+                                    <label for="medicationAllergiesYes" class="form-check-label">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" id="medicationAllergiesNo" name="medicationAllergies" value="N" class="form-check-input" required {% if medical_history and medical_history.medicationAllergies == 'N' %}checked{% endif %}>
+                                    <label for="medicationAllergiesNo" class="form-check-label">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Do you use tobacco?</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" id="usetobacolYes" name="usetobacol" value="Y" class="form-check-input" required {% if medical_history and medical_history.usetobacol == 'Y' %}checked{% endif %}>
+                                    <label for="usetobacolYes" class="form-check-label">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" id="usetobacolNo" name="usetobacol" value="N" class="form-check-input" required {% if medical_history and medical_history.usetobacol == 'N' %}checked{% endif %}>
+                                    <label for="usetobacolNo" class="form-check-label">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="alcohol" class="form-label">Alcohol Use:</label>
+                            <select id="alcohol" name="alcohol" class="form-select" required>
+                                <option value="Daily" {% if medical_history and medical_history.alcohol == 'Daily' %}selected{% endif %}>Daily</option>
+                                <option value="Weekly" {% if medical_history and medical_history.alcohol == 'Weekly' %}selected{% endif %}>Weekly</option>
+                                <option value="Monthly" {% if medical_history and medical_history.alcohol == 'Monthly' %}selected{% endif %}>Monthly</option>
+                                <option value="Never" {% if medical_history and medical_history.alcohol == 'Never' %}selected{% endif %}>Never</option>
+                                <option value="Other" {% if medical_history and medical_history.alcohol == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
             <p>&copy; 2024 E-Hospital</p>

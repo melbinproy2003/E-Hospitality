@@ -1,5 +1,67 @@
 {% extends "patient/Index.html" %}
 {% load static %}
+
 {% block content %}
-  hello
+<div class="container mt-4">
+    <div class="row">
+        <!-- Welcome Message -->
+        <div class="col-12 text-center mb-4">
+            <h1 class="display-4">Welcome, {{ patient.first_name }}!</h1>
+            <p class="lead">Your health is our priority.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Upcoming Appointments Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Appointments</h2>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'showappointments' %}" class="btn btn-primary">View All Appointments</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health Tips Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Health Tips</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        {% for tip in health_tips %}
+                            <li class="mb-3">
+                                <h5>{{ tip.title }}</h5>
+                                <p>{{ tip.content }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Quick Links Section -->
+        <div class="col mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Book an Appointment</h5>
+                    <a href="{% url 'showdoctors' %}" class="btn btn-primary">Book Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">View Medical Records</h5>
+                    <a href="{% url 'medicalhistory' %}" class="btn btn-secondary">View Records</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}

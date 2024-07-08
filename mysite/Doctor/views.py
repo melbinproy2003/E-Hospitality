@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from guest.models import PatientTable
 from Webadmin.models import DoctorTable
+from Patient.models import AppoinmentTable
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
@@ -39,3 +40,12 @@ def update_profile_image(request):
             messages.error(request, 'No image selected.')
     
     return render(request, 'doctor/profile.html', {'profile': profile})
+
+def appointment_list(request):
+    doctor_id = request.session.get('id')  # Assuming 'id' in session refers to doctor id
+    doctor = get_object_or_404(DoctorTable, id=doctor_id)  # Adjust DoctorTable as per your model name
+
+    # Retrieve appointments where doctor_id matches the doctor's id from session
+    appointments = AppoinmentTable.objects.filter(doctor_id=doctor_id)
+
+    return render(request, 'doctor/appointment_list.html', {'appointments': appointments, 'doctor': doctor})
