@@ -80,7 +80,7 @@ def loginpage(request):
                 try:
                     doctor = DoctorTable.objects.get(email=email)
                     request.session['id'] = doctor.id
-                    request.session['type'] = "doctor"  # Set the session type to 'doctor'
+                    request.session['type'] = "doctor"
                     return redirect('doctor')
                 except DoctorTable.DoesNotExist:
                     messages.error(request, 'Doctor not found')

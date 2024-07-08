@@ -21,3 +21,13 @@ class DepartmentTable(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+    
+class AssignDoctor(models.Model):
+    id = models.AutoField(primary_key=True)
+    doctor = models.ForeignKey(DoctorTable, on_delete=models.CASCADE)
+    department = models.ForeignKey(DepartmentTable, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.doctor} {self.department}"

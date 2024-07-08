@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from guest.models import PatientTable
-from Webadmin.models import DoctorTable
+from Webadmin.models import DoctorTable, DepartmentTable, AssignDoctor
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
@@ -39,3 +39,10 @@ def update_patient_profile_image(request):
             messages.error(request, 'No image selected.')
     
     return render(request, 'patient/profile.html', {'profile': profile})
+
+@patient_required
+def showdoctors(request):
+    departments = DepartmentTable.objects.all()
+    assign = AssignDoctor.objects.select_related('department').all()
+    doctors = DoctorTable.objects.all()
+    return render(request, 'patient/Services.html', {'doctors': doctors, 'departments': departments, 'assign': assign})

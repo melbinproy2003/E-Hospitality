@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Deparments</h1>
+    <h1 class="mb-4">Departments</h1>
     <div class="table-responsive">
         <table class="table table-hover">
             <thead>
@@ -14,23 +14,96 @@
                 </tr>
             </thead>
             <tbody>
-                {% for department in departments %}
+                {% for department in page_obj %}
                 <tr>
-                    <td>{{ department.id }}</td>
+                    <td>{{ forloop.counter }}</td>
                     <td>{{ department.name }}</td>
                     <td>
-                        <a href="#" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="#" class="btn btn-danger btn-sm">Delete</a>
-                        <a href="#" class="btn btn-secondary btn-sm">Leave</a>
+                        <a href="#deleteDepartmentModal{{ department.id }}" class="btn btn-danger btn-sm" data-bs-toggle="modal">Delete</a>
                     </td>
                 </tr>
+
+                <!-- Modal -->
+                <div id="deleteDepartmentModal{{ department.id }}" class="modal fade" tabindex="-1" aria-labelledby="deleteDepartmentModalLabel{{ department.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteDepartmentModalLabel{{ department.id }}">Delete Department "{{ department.name }}"</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-footer">
+                                <form method="POST" action="{% url 'removedepartment' department.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    <!-- <a href="{% url 'newdepartments' %}" class="btn btn-primary rounded-circle float-end">
-        <i class="fa fa-plus"></i>
-    </a> -->
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item disabled">
+                <a class="page-link" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item disabled">
+                <a class="page-link" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
     <button type="button" class="btn btn-primary rounded-circle float-end" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">
         <i class="fa fa-plus"></i>
     </button>
