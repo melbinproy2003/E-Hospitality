@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
+from datetime import datetime
 from django.contrib import messages
 from django.contrib.sessions.backends.db import SessionStore
+from Patient.models import AppoinmentTable
+from Doctor.models import Prescribition
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from .models import loginTable, PatientTable
@@ -105,7 +108,12 @@ def webadmin(request):
 def doctor(request):
     id = request.session.get('id')
     type = request.session.get('type')
-    return render(request, 'doctor/Home.html', {'id': id,'type': type})
+    current_date = datetime.now().date()
+    appointments_today = AppoinmentTable.objects.filter(date=current_date, doctor_id=id)
+    appointments = AppoinmentTable.objects.filter(doctor_id=id)
+    appointment_ids = appointments.values_list('id', flat=True)
+    prescriptions = Prescribition.objects.filter(appoinmenet_id__in=appointment_ids).values_list('appoinmenet_id', flat=True)
+    return render(request, 'doctor/Home.html', {'id': id, 'type': type, 'appointments': appointments_today, 'prescriptions': prescriptions})
 
 @patient_required
 def patient(request):
@@ -114,11 +122,6 @@ def patient(request):
     return render(request, 'patient/Home.html', {'id': id,'type': type})
 
 def logout_view(request):
-    # Clear the session
     request.session.flush()
-
-    # Create a new session
     request.session = SessionStore()
-
-    # Redirect the user to the login page
     return HttpResponseRedirect(reverse_lazy('login'))

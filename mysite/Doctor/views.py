@@ -20,7 +20,7 @@ def doctor_required(view_func):
 def profile(request):
     id = request.session.get('id')
     profile = DoctorTable.objects.get(id=id)
-    return render(request, 'doctor/profile.html', {'profile': profile, 'id': id})
+    return render(request, 'doctor/Home.html', {'profile': profile, 'id': id})
 
 @doctor_required
 def update_profile_image(request):

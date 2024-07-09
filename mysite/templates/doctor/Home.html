@@ -7,9 +7,51 @@
         <div class="col">
             <h2 class="mb-4">Doctor Home Page</h2>
             <p>Welcome, Doctor</p>
-            <!-- Replace `{{ user.username }}` with the actual way you retrieve the doctor's name or identifier -->
             <p>This is your doctor home page content.</p>
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Today's Appointments</h4>
+                </div>
+                <div class="card-body">
+                    {% for appointment in appointments %}
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="appointment mb-3">
+                                <h5>Patient: {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+                                </h5>
+                                <p>Time: {{ appointment.time }}</p>
+                            </div>
+                            {% empty %}
+                            <p>No appointments for today.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mt-4">
+        <div class="card-header">
+            <h4>Pending Tasks</h4>
+        </div>
+        <div class="card-body">
+            <!-- Replace with dynamic content -->
+            {% for task in prescriptions %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="appointment mb-3">
+                        <h5>Patient: {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+                        </h5>
+                        <p>Time: {{ appointment.time }}</p>
+                    </div>
+                    {% empty %}
+                    <p>No appointments for today.</p>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
-{% endblock content %}
+</div>
+</div>
+{% endblock %}
