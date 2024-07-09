@@ -1,9 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 from django.contrib import messages
 from django.utils import timezone
 from guest.models import PatientTable
 from Webadmin.models import DoctorTable, DepartmentTable, AssignDoctor
 from .models import AppoinmentTable, MedicalHistory
+from Doctor.models import Prescribition
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
@@ -50,7 +54,7 @@ def showdoctors(request):
     return render(request, 'patient/Services.html', {'doctors': doctors, 'departments': departments, 'assign': assign})
 
 @patient_required
-def appointment(request, id):
+def bookappointment(request, id):
     if request.method == 'POST':
         patient_id = request.session.get('id')
         doctor = get_object_or_404(DoctorTable, id=id)
@@ -69,10 +73,58 @@ def appointment(request, id):
     else:
         return render(request, 'patient/Services.html', {'id': id})
 
-def showappointments(request):
+def showmyappointments(request):
     patient_id = request.session.get('id')
     appointments = AppoinmentTable.objects.filter(patient_id=patient_id)
-    return render(request, 'patient/Appointments.html', {'appointments': appointments})
+    appointment_data = [(appointment, Prescribition.objects.filter(appoinmenet=appointment)) for appointment in appointments]
+    return render(request, 'patient/Appointments.html', {'appointment_data': appointment_data})
+
+@patient_required
+def cancelappointment(request, id):
+    appointment = get_object_or_404(AppoinmentTable, id=id)
+    appointment.delete()
+    messages.success(request, 'Appointment canceled successfully.')
+    return redirect('showmyappointments')
+
+def download_prescription(request, appointment_id):
+    appointment = get_object_or_404(AppoinmentTable, id=appointment_id)
+    prescriptions = Prescribition.objects.filter(appoinmenet=appointment)
+
+    # Create the HttpResponse object with the appropriate PDF headers.
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="prescriptions_{appointment_id}.pdf"'
+
+    # Create the PDF object, using the response object as its "file."
+    p = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
+
+    # Title
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(30, height - 40, "Prescriptions")
+    
+    y = height - 60
+    for prescription in prescriptions:
+        if y < 100:
+            p.showPage()
+            y = height - 40
+        p.setFont("Helvetica-Bold", 12)
+        p.drawString(30, y, f"Doctor: {prescription.appoinmenet.doctor.first_name} {prescription.appoinmenet.doctor.last_name}")
+        y -= 14
+        p.setFont("Helvetica", 12)
+        p.drawString(30, y, f"Title: {prescription.title}")
+        y -= 14
+        p.drawString(30, y, f"Prescription: {prescription.prescription}")
+        y -= 14
+        p.drawString(30, y, f"Date: {prescription.created_at}")
+        y -= 28
+        p.line(30, y, width - 30, y)
+        y -= 14
+
+    # Close the PDF object cleanly.
+    p.showPage()
+    p.save()
+
+    return response
     
 @patient_required
 def create_update_medical_history(request):

@@ -6,7 +6,7 @@
 <div class="container mt-4">
     <h1 class="mb-4">Appointments</h1>
     <div class="row">
-        {% for appointment in appointments %}
+        {% for appointment, prescriptions in appointment_data %}
             <div class="col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
@@ -15,10 +15,69 @@
                         <p class="card-text"><strong>Time:</strong> {{ appointment.time }}</p>
                         <p class="card-text"><strong>Message:</strong> {{ appointment.message }}</p>
                     </div>
+                    <div class="card-footer text-center">
+                        {% if not prescriptions %}
+                        <a href="#cancelAppointmentModal{{ appointment.id }}" class="btn btn-danger" data-bs-toggle="modal">Cancel</a>
+                        {% else %}
+                        <a href="#PrescriptionsModal{{ appointment.id }}" class="btn btn-info" data-bs-toggle="modal">View Prescriptions</a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         {% endfor %}
     </div>
 </div>
 
-{% endblock content %}
+<!-- Cancel Appointment Modals -->
+{% for appointment, prescriptions in appointment_data %}
+<div id="cancelAppointmentModal{{ appointment.id }}" class="modal fade" tabindex="-1" aria-labelledby="cancelAppointmentModalLabel{{ appointment.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="cancelAppointmentModalLabel{{ appointment.id }}">Cancel Appointment</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'cancelappointment' appointment.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this appointment?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">Cancel Appointment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- View Prescriptions Modals -->
+{% for appointment, prescriptions in appointment_data %}
+<div class="modal fade" id="PrescriptionsModal{{ appointment.id }}" tabindex="-1" aria-labelledby="PrescriptionsModalLabel{{ appointment.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 class="modal-title mb-2 text-center" id="PrescriptionsModalLabel{{ appointment.id }}"><b>Prescriptions</b></h2>
+                {% for prescription in prescriptions %}
+                    <div class="mb-3">
+                        <h5><b>Doctor:</b> {{ prescription.appoinmenet.doctor.first_name }} {{ prescription.appoinmenet.doctor.last_name }}</h5>
+                        <p><b>Title:</b> {{ prescription.title }}</p>
+                        <p><b>Prescription:</b> {{ prescription.prescription }}</p>
+                        <p><b>Date:</b> {{ prescription.created_at }}</p>
+                        <hr>
+                    </div>
+                {% empty %}
+                    <p>No previous prescriptions found.</p>
+                {% endfor %}
+                <div class="modal-footer">
+                    <a href="{% url 'download_prescription' appointment.id %}" class="btn btn-secondary">Download</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+{% endblock %}

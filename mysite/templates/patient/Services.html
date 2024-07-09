@@ -51,7 +51,7 @@
                 <h3 class="modal-title" id="AppointmentModalLabel{{ assignment.doctor.id }}">Dr. {{ assignment.doctor.first_name }} {{ assignment.doctor.last_name }} ({{ assignment.doctor.specialized }})</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>                                
-            <form method="POST" action="{% url 'appointment' assignment.doctor.id %}">
+            <form method="POST" action="{% url 'bookappointment' assignment.doctor.id %}">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="mb-3">

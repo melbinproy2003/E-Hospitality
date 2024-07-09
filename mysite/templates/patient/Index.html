@@ -68,7 +68,7 @@
                             <a class="nav-link" href="{% url 'showdoctors' %}">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'showappointments' %}">showappointments</a>
+                            <a class="nav-link" href="{% url 'showmyappointments' %}">showappointments</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link " href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -106,7 +106,6 @@
                             <textarea id="FamilyTree" name="FamilyTree" class="form-control" rows="3" required>{{ medical_history.FamilyTree|default_if_none:'' }}</textarea>
                         </div>
                         <div class="mb-3">
-                            <!-- <label for="symptoms" class="form-label">Symptoms:</label> -->
                              <p>Any symotoms that you have like chest pain,shortness of breathetc</p>
                             <textarea id="symptoms" name="symptoms" class="form-control" rows="3" required>{{ medical_history.symptoms|default_if_none:'' }}</textarea>
                         </div>

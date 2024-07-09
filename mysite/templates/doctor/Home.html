@@ -1,5 +1,15 @@
 {% extends "doctor/base.html" %}
 {% load static %}
+
 {% block content %}
-  I am Doctor
+<div class="container mt-4">
+    <div class="row">
+        <div class="col">
+            <h2 class="mb-4">Doctor Home Page</h2>
+            <p>Welcome, Dr. {{ doctor.first_name }}{{ doctor.last_name }}!</p>
+            <!-- Replace `{{ user.username }}` with the actual way you retrieve the doctor's name or identifier -->
+            <p>This is your doctor home page content.</p>
+        </div>
+    </div>
+</div>
 {% endblock content %}

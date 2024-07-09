@@ -1,0 +1,163 @@
+{% extends 'doctor/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col">
+            <h2 class="mb-4">Appointment Details</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>Patient</th>
+                            <td>{{ data.patient }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date</th>
+                            <td>{{ data.date }}</td>
+                        </tr>
+                        <tr>
+                            <th>Time</th>
+                            <td>{{ data.time }}</td>
+                        </tr>
+                        <tr>
+                            <th>Message</th>
+                            <td>{{ data.message }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <a href="#medicalHistoryModal" class="btn btn-success btn-sm" data-bs-toggle="modal">Medical History</a>
+                                {% if not current_prescriptions %}
+                                <a href="#prescriptionModal{{ data.id }}" class="btn btn-success btn-sm" data-bs-toggle="modal">Prescription</a>
+                                {% endif %}
+                                <a href="#previousPrescriptionsModal{{ data.patient.id }}" class="btn btn-success btn-sm" data-bs-toggle="modal">Previous Prescriptions</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Medical History -->
+<div class="modal fade" id="medicalHistoryModal" tabindex="-1" aria-labelledby="medicalHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 class="modal-title mb-2 text-center" id="medicalHistoryModalLabel"><b>Medical History</b></h2>
+                <div class="mb-3">
+                    <p><b>1)</b> Asthma, Diabetes, Epilepsy, etc. - conditions that you or any member of your family has</p>
+                    <label for="FamilyTree" class="form-label">List these types of diseases:</label>
+                    <div id="FamilyTree" style="color: rgb(38, 41, 222);">{{ history.FamilyTree|default_if_none:'' }}</div>
+                </div>
+                <div class="mb-3">
+                    <p><b>2)</b> Any symptoms that you have like chest pain, shortness of breath, etc.</p>
+                    <div id="symptoms" style="color: rgb(38, 41, 222);">{{ history.symptoms|default_if_none:'' }}</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">3) Are you taking any medication?</label>
+                    <div style="color: rgb(38, 41, 222);">
+                        {% if history and history.takingMedication == 'Y' %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="listmedication" class="form-label">List Medication:</label>
+                    <div id="listmedication" style="color: rgb(38, 41, 222);">{{ history.listmedication|default_if_none:'' }}</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">4) Do you have any medication allergies?</label>
+                    <div style="color: rgb(38, 41, 222);">
+                        {% if history and history.medicationAllergies == 'Y' %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">5) Do you use tobacco?</label>
+                    <div style="color: rgb(38, 41, 222);">
+                        {% if history and history.usetobacol == 'Y' %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="alcohol" class="form-label">6) Alcohol Use:</label>
+                    <div id="alcohol" style="color: rgb(38, 41, 222);">
+                        {% if history and history.alcohol %}
+                            {{ history.alcohol }}
+                        {% else %}
+                            Not specified
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <label class="form-label">Last updated on: {{ history.date }}</label>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Prescription Modal -->
+<div class="modal fade" id="prescriptionModal{{ data.id }}" tabindex="-1" aria-labelledby="prescriptionModalLabel{{ data.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 class="modal-title mb-2 text-center" id="prescriptionModalLabel{{ data.id }}"><b>Prescription Details</b></h2>
+                <form method="POST" action="{% url 'prescription' data.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title:</label>
+                        <input type="text" id="title" name="title" class="form-control" value="{{ prescription.title|default_if_none:'' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="prescription" class="form-label">Prescription:</label>
+                        <textarea id="prescription" name="prescription" class="form-control" rows="5" required>{{ prescription.prescription|default_if_none:'' }}</textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Previous Prescriptions Modal -->
+<div class="modal fade" id="previousPrescriptionsModal{{ data.patient.id }}" tabindex="-1" aria-labelledby="previousPrescriptionsModalLabel{{ data.patient.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 class="modal-title mb-2 text-center" id="previousPrescriptionsModalLabel{{ data.patient.id }}"><b>Previous Prescriptions</b></h2>
+                {% for prescription in previous_prescriptions %}
+                    <div class="mb-3">
+                        <h5><b>Doctor:</b> {{ prescription.appoinmenet.doctor.first_name }} {{ prescription.appoinmenet.doctor.last_name }}</h5>
+                        <p><b>Title:</b> {{ prescription.title }}</p>
+                        <p><b>Prescription:</b> {{ prescription.prescription }}</p>
+                        <p><b>Date:</b> {{ prescription.created_at }}</p>
+                        <hr>
+                    </div>
+                {% empty %}
+                    <p>No previous prescriptions found.</p>
+                {% endfor %}
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

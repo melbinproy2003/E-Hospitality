@@ -3,75 +3,59 @@
 {% block content %}
 
 <div class="container mt-4">
-    <h1 class="mb-4">Medical History of {{ patient.first_name }} {{ patient.last_name }}</h1>
+    <h1 class="mb-4">Medical History</h1>
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-body">
-                <form method="post" action="{% url 'medicalhistory' %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <p>Asthma, Diabetes, Epilepsy, etc., conditions that you have or any member of your family has.</p>
-                        <label for="FamilyTree" class="form-label">List this type of disease:</label>
-                        <textarea id="FamilyTree" name="FamilyTree" class="form-control" rows="3" required>{{ medical_history.FamilyTree|default_if_none:'' }}</textarea>
+                <div class="mb-3">
+                    <p>Asthma, Diabetes, Epilepsy, etc., conditions that you have or any member of your family has.</p>
+                    <label for="FamilyTree" class="form-label">List this type of disease:</label>
+                    <div id="FamilyTree" class="form-control-plaintext">{{ medical_history.FamilyTree|default_if_none:'' }}</div>
+                </div>
+                <div class="mb-3">
+                    <p>Any symptoms that you have like chest pain, shortness of breath, etc.</p>
+                    <div id="symptoms" class="form-control-plaintext">{{ medical_history.symptoms|default_if_none:'' }}</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Are you taking any medication?</label>
+                    <div class="form-control-plaintext">
+                        {% if medical_history and medical_history.takingMedication == 'Y' %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
                     </div>
-                    <div class="mb-3">
-                        <p>Any symptoms that you have like chest pain, shortness of breath, etc.</p>
-                        <textarea id="symptoms" name="symptoms" class="form-control" rows="3" required>{{ medical_history.symptoms|default_if_none:'' }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="listmedication" class="form-label">List Medication:</label>
+                    <div id="listmedication" class="form-control-plaintext">{{ medical_history.listmedication|default_if_none:'' }}</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Do you have any medication allergies?</label>
+                    <div class="form-control-plaintext">
+                        {% if medical_history and medical_history.medicationAllergies == 'Y' %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Are you taking any medication?</label>
-                        <div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" id="takingMedicationYes" name="takingMedication" value="Y" class="form-check-input" required {% if medical_history and medical_history.takingMedication == 'Y' %}checked{% endif %}>
-                                <label for="takingMedicationYes" class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" id="takingMedicationNo" name="takingMedication" value="N" class="form-check-input" required {% if medical_history and medical_history.takingMedication == 'N' %}checked{% endif %}>
-                                <label for="takingMedicationNo" class="form-check-label">No</label>
-                            </div>
-                        </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Do you use tobacco?</label>
+                    <div class="form-control-plaintext">
+                        {% if medical_history and medical_history.usetobacol == 'Y' %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
                     </div>
-                    <div class="mb-3">
-                        <label for="listmedication" class="form-label">List Medication:</label>
-                        <textarea id="listmedication" name="listmedication" class="form-control" rows="3">{{ medical_history.listmedication|default_if_none:'' }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="alcohol" class="form-label">Alcohol Use:</label>
+                    <div id="alcohol" class="form-control-plaintext">
+                        {{ medical_history.alcohol|default_if_none:'Not specified' }}
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Do you have any medication allergies?</label>
-                        <div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" id="medicationAllergiesYes" name="medicationAllergies" value="Y" class="form-check-input" required {% if medical_history and medical_history.medicationAllergies == 'Y' %}checked{% endif %}>
-                                <label for="medicationAllergiesYes" class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" id="medicationAllergiesNo" name="medicationAllergies" value="N" class="form-check-input" required {% if medical_history and medical_history.medicationAllergies == 'N' %}checked{% endif %}>
-                                <label for="medicationAllergiesNo" class="form-check-label">No</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Do you use tobacco?</label>
-                        <div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" id="usetobacolYes" name="usetobacol" value="Y" class="form-check-input" required {% if medical_history and medical_history.usetobacol == 'Y' %}checked{% endif %}>
-                                <label for="usetobacolYes" class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" id="usetobacolNo" name="usetobacol" value="N" class="form-check-input" required {% if medical_history and medical_history.usetobacol == 'N' %}checked{% endif %}>
-                                <label for="usetobacolNo" class="form-check-label">No</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="alcohol" class="form-label">Alcohol Use:</label>
-                        <select id="alcohol" name="alcohol" class="form-select" required>
-                            <option value="Daily" {% if medical_history and medical_history.alcohol == 'Daily' %}selected{% endif %}>Daily</option>
-                            <option value="Weekly" {% if medical_history and medical_history.alcohol == 'Weekly' %}selected{% endif %}>Weekly</option>
-                            <option value="Monthly" {% if medical_history and medical_history.alcohol == 'Monthly' %}selected{% endif %}>Monthly</option>
-                            <option value="Never" {% if medical_history and medical_history.alcohol == 'Never' %}selected{% endif %}>Never</option>
-                            <option value="Other" {% if medical_history and medical_history.alcohol == 'Other' %}selected{% endif %}>Other</option>
-                        </select>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>         
