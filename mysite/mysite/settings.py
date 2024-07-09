@@ -129,3 +129,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STRIPE_PUBLISHABLE_KEY='pk_test_51PA3xvSC3wKreZd2ZhKDtfOYKouNeGkPpV09SB2OO2W2GuWuaQloWQ7TWSD4ItNvRJcqaEALeU9W4FFrnsCLxFpe00VvJCSvKU'
+STRIPE_SECRET_KEY='sk_test_51PA3xvSC3wKreZd2sfUF6sd2kjBFWBsF5oxd2P51jwVEccpmPagLDx1HfNzkxJkUKLH219ke23X3wuzZzwzS8KEy007nSfYaVh'

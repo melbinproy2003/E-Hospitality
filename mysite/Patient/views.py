@@ -6,10 +6,14 @@ from django.contrib import messages
 from django.utils import timezone
 from guest.models import PatientTable
 from Webadmin.models import DoctorTable, DepartmentTable, AssignDoctor
-from .models import AppoinmentTable, MedicalHistory
+from .models import AppoinmentTable, MedicalHistory, payment
 from Doctor.models import Prescribition
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.conf import settings
+import stripe
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # Create your views here.
 def patient_required(view_func):
@@ -69,15 +73,17 @@ def bookappointment(request, id):
         )
         appointment.save()
         messages.success(request, 'Appointment booked successfully.')
-        return redirect('patient')  # Replace with the actual URL name for patient dashboard
+        return redirect('showmyappointments')
     else:
         return render(request, 'patient/Services.html', {'id': id})
 
+@patient_required
 def showmyappointments(request):
     patient_id = request.session.get('id')
     appointments = AppoinmentTable.objects.filter(patient_id=patient_id)
     appointment_data = [(appointment, Prescribition.objects.filter(appoinmenet=appointment)) for appointment in appointments]
-    return render(request, 'patient/Appointments.html', {'appointment_data': appointment_data})
+    bill = payment.objects.filter(prescription__appoinmenet__patient_id=patient_id)
+    return render(request, 'patient/Appointments.html', {'appointment_data': appointment_data, 'bill': bill})
 
 @patient_required
 def cancelappointment(request, id):
@@ -125,7 +131,7 @@ def download_prescription(request, appointment_id):
     p.save()
 
     return response
-    
+
 @patient_required
 def create_update_medical_history(request):
     patient_id = request.session.get('id')
@@ -171,10 +177,56 @@ def create_update_medical_history(request):
                 time=timezone.now().time(),
             )
             medical_history.save()
-        return redirect('patient')
+        return redirect('patientprofile')
 
     context = {
         'patient': patient,
         'medical_history': medical_history,
     }
     return render(request, 'patient/create_medical_history.html', context)
+
+@patient_required
+def initiate_payment(request, prescription_id):
+    prescribition = get_object_or_404(Prescribition, id=prescription_id)
+    if request.method == 'POST':
+        try:
+            session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[{
+                    'price_data': {
+                        'currency': 'usd',
+                        'product_data': {
+                            'name': 'Consultation Fee',
+                        },
+                        'unit_amount': 5000,  # $50.00 in cents
+                    },
+                    'quantity': 1,
+                }],
+                mode='payment',
+                success_url=request.build_absolute_uri(f'/payment_success/{prescription_id}/'),
+                cancel_url=request.build_absolute_uri('/payment_cancel/'),
+            )
+            return redirect(session.url, code=303)
+        except Exception as e:
+            messages.error(request, str(e))
+            return redirect('showmyappointments')
+    return render(request, 'patient/payment.html', {'prescription': prescribition})
+
+
+
+@patient_required
+def payment_success(request, prescription_id):
+    prescribition = get_object_or_404(Prescribition, id=prescription_id)
+    payment.objects.create(
+        prescription=prescribition,
+        amount=5000,  # The amount you charged
+        date=timezone.now().date(),
+        time=timezone.now().time(),
+    )
+    messages.success(request, 'Payment successful!')
+    return render(request, 'patient/success.html', {'prescription': prescribition})
+
+@patient_required
+def payment_cancel(request):
+    messages.error(request, 'Payment canceled.')
+    return render(request, 'patient/cancel.html')

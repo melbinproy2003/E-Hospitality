@@ -17,9 +17,10 @@
                     </div>
                     <div class="card-footer text-center">
                         {% if not prescriptions %}
-                        <a href="#cancelAppointmentModal{{ appointment.id }}" class="btn btn-danger" data-bs-toggle="modal">Cancel</a>
+                            <a href="#cancelAppointmentModal{{ appointment.id }}" class="btn btn-danger" data-bs-toggle="modal">Cancel</a>
                         {% else %}
-                        <a href="#PrescriptionsModal{{ appointment.id }}" class="btn btn-info" data-bs-toggle="modal">View Prescriptions</a>
+                                <a href="{% url 'billpayment' prescriptions.0.id %}" class="btn btn-success" data-bs-toggle="modal">Payment</a>
+                                <a href="#PrescriptionsModal{{ appointment.id }}" class="btn btn-info" data-bs-toggle="modal">View Prescriptions</a>
                         {% endif %}
                     </div>
                 </div>
@@ -27,6 +28,7 @@
         {% endfor %}
     </div>
 </div>
+
 
 <!-- Cancel Appointment Modals -->
 {% for appointment, prescriptions in appointment_data %}
