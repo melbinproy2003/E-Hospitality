@@ -11,6 +11,7 @@ E-Hospitality is a comprehensive healthcare management system developed using Py
   - [Patient Module](#patient-module)
   - [Admin Module](#admin-module)
   - [Doctor Module](#doctor-module)
+- [Tech Stack](#Tech-Stack)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contact](#contact)
@@ -36,6 +37,12 @@ E-Hospitality is a comprehensive healthcare management system developed using Py
 - **Patient Management:** Provides access to patient records, medical histories, and treatment plans, facilitating informed decision-making.
 - **Appointment Schedule:** Displays doctors' schedules, appointment details, and patient information for efficient time management.
 - **E-Prescribing:** Enables doctors to electronically prescribe medications, check for drug interactions, and send prescriptions directly to pharmacies.
+
+## Tech Stack
+
+- **Backend**: Python, Django
+- **Frontend**: HTML, CSS, JavaScript
+- **Database**: SQLite
 
 ## Installation
 
