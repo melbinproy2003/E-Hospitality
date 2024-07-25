@@ -41,7 +41,7 @@ E-Hospitality is a comprehensive healthcare management system developed using Py
 ## Tech Stack
 
 - **Backend**: Python, Django
-- **Frontend**: HTML, CSS, JavaScript
+- **Frontend**: HTML, CSS, Bootstrap
 - **Database**: SQLite
 
 ## Installation
