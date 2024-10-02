@@ -7,32 +7,38 @@
     <h1 class="mb-4">Appointments</h1>
     <div class="row">
         {% for appointment, prescriptions in appointment_data %}
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="card-title">{{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}</h2>
-                        <p class="card-text"><strong>Date:</strong> {{ appointment.date }}</p>
-                        <p class="card-text"><strong>Time:</strong> {{ appointment.time }}</p>
-                        <p class="card-text"><strong>Message:</strong> {{ appointment.message }}</p>
-                    </div>
-                    <div class="card-footer text-center">
-                        {% if not prescriptions %}
-                            <a href="#cancelAppointmentModal{{ appointment.id }}" class="btn btn-danger" data-bs-toggle="modal">Cancel</a>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">{{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}</h2>
+                    <p class="card-text"><strong>Date:</strong> {{ appointment.date }}</p>
+                    <p class="card-text"><strong>Time:</strong> {{ appointment.time }}</p>
+                    <p class="card-text"><strong>Message:</strong> {{ appointment.message }}</p>
+                </div>
+                <div class="card-footer text-center">
+                    {% if not prescriptions %}
+                    <a href="#cancelAppointmentModal{{ appointment.id }}" class="btn btn-danger" data-bs-toggle="modal">Cancel</a>
+                    {% else %}
+                    {% for prescription, has_payment in prescriptions %}
+                        {% if not has_payment %}
+                        <a href="{% url 'billpayment' prescription.id %}" class="btn btn-success">Payment</a>
                         {% else %}
-                                <a href="{% url 'billpayment' prescriptions.0.id %}" class="btn btn-success" data-bs-toggle="modal">Payment</a>
-                                <a href="#PrescriptionsModal{{ appointment.id }}" class="btn btn-info" data-bs-toggle="modal">View Prescriptions</a>
+                        <a href="#billModal{{ prescription.id }}" class="btn btn-warning" data-bs-toggle="modal">Bill</a>
+                        <a href="#PrescriptionsModal{{ appointment.id }}" class="btn btn-info" data-bs-toggle="modal">View Prescriptions</a>
                         {% endif %}
-                    </div>
+                    {% endfor %}
+                    {% endif %}
                 </div>
             </div>
+        </div>
         {% endfor %}
     </div>
 </div>
 
-
 <!-- Cancel Appointment Modals -->
 {% for appointment, prescriptions in appointment_data %}
-<div id="cancelAppointmentModal{{ appointment.id }}" class="modal fade" tabindex="-1" aria-labelledby="cancelAppointmentModalLabel{{ appointment.id }}" aria-hidden="true">
+<div id="cancelAppointmentModal{{ appointment.id }}" class="modal fade" tabindex="-1"
+    aria-labelledby="cancelAppointmentModalLabel{{ appointment.id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -42,7 +48,7 @@
             <form method="POST" action="{% url 'cancelappointment' appointment.id %}">
                 {% csrf_token %}
                 <div class="modal-body">
-                    <p>Are you sure you want to cancel this appointment?</p>
+                    <p>Are you sure you want to cancel the appointment with Dr. {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }} on {{ appointment.date }}?</p>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-danger">Cancel Appointment</button>
@@ -55,12 +61,15 @@
 
 <!-- View Prescriptions Modals -->
 {% for appointment, prescriptions in appointment_data %}
-<div class="modal fade" id="PrescriptionsModal{{ appointment.id }}" tabindex="-1" aria-labelledby="PrescriptionsModalLabel{{ appointment.id }}" aria-hidden="true">
+<div class="modal fade" id="PrescriptionsModal{{ appointment.id }}" tabindex="-1"
+    aria-labelledby="PrescriptionsModalLabel{{ appointment.id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-body">
-                <h2 class="modal-title mb-2 text-center" id="PrescriptionsModalLabel{{ appointment.id }}"><b>Prescriptions</b></h2>
-                {% for prescription in prescriptions %}
+                <h2 class="modal-title mb-2 text-center" id="PrescriptionsModalLabel{{ appointment.id }}">
+                    <b>Prescriptions</b></h2>
+                {% if prescriptions %}
+                    {% for prescription, has_payment in prescriptions %}
                     <div class="mb-3">
                         <h5><b>Doctor:</b> {{ prescription.appoinmenet.doctor.first_name }} {{ prescription.appoinmenet.doctor.last_name }}</h5>
                         <p><b>Title:</b> {{ prescription.title }}</p>
@@ -68,9 +77,10 @@
                         <p><b>Date:</b> {{ prescription.created_at }}</p>
                         <hr>
                     </div>
-                {% empty %}
+                    {% endfor %}
+                {% else %}
                     <p>No previous prescriptions found.</p>
-                {% endfor %}
+                {% endif %}
                 <div class="modal-footer">
                     <a href="{% url 'download_prescription' appointment.id %}" class="btn btn-secondary">Download</a>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -81,5 +91,32 @@
 </div>
 {% endfor %}
 
+<!-- Bill Modals -->
+{% for appointment, prescriptions in appointment_data %}
+    {% for prescription, has_payment in prescriptions %}
+        {% if prescription.id %}
+        <div class="modal fade" id="billModal{{ prescription.id }}" tabindex="-1" aria-labelledby="billModalLabel{{ prescription.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="billModalLabel{{ prescription.id }}">Bill for Prescription #{{ prescription.id }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Prescription ID:</strong> {{ prescription.id }}</p>
+                        <p><strong>Doctor:</strong> {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}</p>
+                        <p><strong>Date:</strong> {{ appointment.date }}</p>
+                        <p><strong>Total Amount:</strong> $50.00</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{% url 'download_bill' prescription.id %}" class="btn btn-primary">Download Bill</a>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+{% endfor %}
 
 {% endblock %}

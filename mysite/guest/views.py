@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from datetime import datetime
 from django.contrib import messages
 from django.contrib.sessions.backends.db import SessionStore
-from Patient.models import AppoinmentTable
+from Patient.models import AppoinmentTable,MedicalHistory
 from Doctor.models import Prescribition
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy

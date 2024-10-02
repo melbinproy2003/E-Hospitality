@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+{% if medicalhistory %}
 <div class="container mt-4">
     <div class="row">
         {% for department in departments %}
@@ -31,7 +32,8 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ assignment.doctor.first_name }} {{ assignment.doctor.last_name }}</td>
                     <td>
-                        <a href="#AppointmentModal{{ assignment.doctor.id }}" class="btn btn-primary" data-bs-toggle="modal">Book Appointment</a>
+                        <a href="#AppointmentModal{{ assignment.doctor.id }}" class="btn btn-primary"
+                            data-bs-toggle="modal">Book Appointment</a>
                     </td>
                 </tr>
                 {% endif %}
@@ -44,13 +46,16 @@
 
 <!-- Appointment Modals -->
 {% for assignment in assign %}
-<div id="AppointmentModal{{ assignment.doctor.id }}" class="modal fade" tabindex="-1" aria-labelledby="AppointmentModalLabel{{ assignment.doctor.id }}" aria-hidden="true">
+<div id="AppointmentModal{{ assignment.doctor.id }}" class="modal fade" tabindex="-1"
+    aria-labelledby="AppointmentModalLabel{{ assignment.doctor.id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title" id="AppointmentModalLabel{{ assignment.doctor.id }}">Dr. {{ assignment.doctor.first_name }} {{ assignment.doctor.last_name }} ({{ assignment.doctor.specialized }})</h3>
+                <h3 class="modal-title" id="AppointmentModalLabel{{ assignment.doctor.id }}">Dr. {{
+                    assignment.doctor.first_name }} {{ assignment.doctor.last_name }} ({{ assignment.doctor.specialized
+                    }})</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>                                
+            </div>
             <form method="POST" action="{% url 'bookappointment' assignment.doctor.id %}">
                 {% csrf_token %}
                 <div class="modal-body">
@@ -67,5 +72,13 @@
     </div>
 </div>
 {% endfor %}
+{% else %}
+<div class="text-center">
+    <h1 class="display-4">No Medical History Found</h1>
+    <p class="lead">Please consult with your doctor for more information.</p>
+    <p class="lead">Please fill it.</p>
+    <a href="#medicalHistoryModal" data-bs-toggle="modal" class="btn btn-info">Add Medical Records</a>
+</div>
+{% endif %}
 
 {% endblock %}

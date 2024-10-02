@@ -37,6 +37,8 @@
                                 <h5>{{ tip.title }}</h5>
                                 <p>{{ tip.content }}</p>
                             </li>
+                        {% empty %}
+                            <li>No health tips available.</li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -64,4 +66,6 @@
         </div>
     </div>
 </div>
+
+
 {% endblock content %}

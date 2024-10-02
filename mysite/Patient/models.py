@@ -42,6 +42,7 @@ class payment(models.Model):
     id = models.AutoField(primary_key=True)
     prescription = models.ForeignKey('Doctor.Prescribition', on_delete=models.CASCADE)
     amount = models.IntegerField()
+    card = models.BigIntegerField()
     date = models.DateField(auto_now_add=True)
     time = models.TimeField(default=timezone.now().time())
 

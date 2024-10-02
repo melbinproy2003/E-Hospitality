@@ -13,4 +13,5 @@ urlpatterns = [
     path('payment/<int:prescription_id>/', views.initiate_payment, name='billpayment'),
     path('payment_success/<int:prescription_id>/', views.payment_success, name='payment_success'),
     path('payment_cancel/', views.payment_cancel, name='payment_cancel'),
+    path('download_bill/<int:prescription_id>/', views.download_bill, name='download_bill'),
 ]
