@@ -79,10 +79,17 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'E-Hospitality',  # Replace with your MongoDB database name
+        'ENFORCE_SCHEMA': False,  # Optional, prevents schema enforcement for NoSQL
+        'CLIENT': {
+            'host': 'localhost',  # or your MongoDB URI
+            'port': 27017,  # default MongoDB port
+            'authSource': 'admin',  # Optional, database to authenticate against
+        }
     }
 }
+
 
 
 # Password validation

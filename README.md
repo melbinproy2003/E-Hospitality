@@ -1,3 +1,4 @@
+Here’s an updated version of your README file for E-Hospitality, including the MongoDB setup section:
 
 ---
 
@@ -11,8 +12,9 @@ E-Hospitality is a comprehensive healthcare management system developed using Py
   - [Patient Module](#patient-module)
   - [Admin Module](#admin-module)
   - [Doctor Module](#doctor-module)
-- [Tech Stack](#Tech-Stack)
+- [Tech Stack](#tech-stack)
 - [Installation](#installation)
+  - [MongoDB Setup](#mongodb-setup)
 - [Usage](#usage)
 - [Contact](#contact)
 
@@ -42,7 +44,7 @@ E-Hospitality is a comprehensive healthcare management system developed using Py
 
 - **Backend**: Python, Django
 - **Frontend**: HTML, CSS, Bootstrap
-- **Database**: SQLite
+- **Database**: MongoDB (using Djongo)
 
 ## Installation
 
@@ -60,15 +62,19 @@ To get started with E-Hospitality, follow these steps:
    ```sh
    pip install -r requirements.txt
    ```
-4. Run migrations to set up the database:
+4. **MongoDB Setup:**  
+   Ensure you have MongoDB installed and running on your machine. You can follow the [official MongoDB installation guide](https://docs.mongodb.com/manual/installation/) for assistance. After installation, start the MongoDB service.
+
+5. Run migrations to set up the database:
    ```sh
+   python manage.py makemigrations
    python manage.py migrate
    ```
-5. Create a superuser for admin access:
+6. Create a superuser for admin access:
    ```sh
    python manage.py createsuperuser
    ```
-6. Start the development server:
+7. Start the development server:
    ```sh
    python manage.py runserver
    ```
