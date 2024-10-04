@@ -1,5 +1,3 @@
-Here’s an updated version of your README file for E-Hospitality, including the MongoDB setup section:
-
 ---
 
 # E-Hospitality
